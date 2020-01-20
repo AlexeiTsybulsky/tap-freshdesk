@@ -238,7 +238,7 @@ def sync_ticket_activities():
     for row in data['activities_data']:
         for key in row['activity'].keys():
             if key not in ['note', 'automation', 'association', 'requester_id', 'source', 'priority', 'new_ticket', 'agent_id','added_tags','Updated Amendment Tool in Internal Tools','send_email','thank_you_note']:
-                updated_schema['properties'][key] = { "type": "string" }
+                updated_schema['properties'][key] = { "type": ["null", "string"] }
 
     bookmark_property = 'performed_at'
     schema = utils.load_schema('ticket_activities')
