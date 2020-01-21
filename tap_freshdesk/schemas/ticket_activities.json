@@ -74,6 +74,9 @@
         },
         "thank_you_note": {
           "type" : ["null", "boolean"]
+        },
+        "spam": {
+          "type" : ["null", "boolean"]
         }
       }
     },
