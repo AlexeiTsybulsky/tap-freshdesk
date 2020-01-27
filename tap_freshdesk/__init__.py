@@ -143,7 +143,7 @@ def sync_tickets_by_filter(bookmark_property, predefined_filter=None):
     end = get_end(state_entity)
 
     params = {
-        'query': "(updated_at:>='2020-01-26' AND updated_at:<='2020-01-27')",
+        'updated_since': start,
         'order_by': bookmark_property,
         'order_type': "asc",
         'include': "requester,company,stats"
