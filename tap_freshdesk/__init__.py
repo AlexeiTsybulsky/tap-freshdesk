@@ -11,7 +11,7 @@ import singer
 from tap_freshdesk import utils
 
 
-REQUIRED_CONFIG_KEYS = ['api_key', 'domain', 'start_date', 'end_date']
+REQUIRED_CONFIG_KEYS = ['api_key', 'domain', 'start_date']
 PER_PAGE = 100
 BASE_URL = "https://{}.freshdesk.com"
 CONFIG = {}
@@ -66,12 +66,6 @@ def request(url, params=None, auth=None):
 def get_start(entity):
     if entity not in STATE:
         STATE[entity] = CONFIG['start_date']
-
-    return STATE[entity]
-
-def get_end(entity):
-    if entity not in STATE:
-        STATE[entity] = CONFIG['end_date']
 
     return STATE[entity]
 
@@ -140,7 +134,6 @@ def sync_tickets_by_filter(bookmark_property, predefined_filter=None):
         state_entity = state_entity + "_" + predefined_filter
 
     start = get_start(state_entity)
-    end = get_end(state_entity)
 
     params = {
         'updated_since': start,
@@ -167,7 +160,7 @@ def sync_tickets_by_filter(bookmark_property, predefined_filter=None):
             for subrow in gen_request(get_url("sub_ticket", id=row['id'], entity="conversations")):
                 subrow.pop("attachments", None)
                 subrow.pop("body", None)
-                if start <= subrow[bookmark_property] <= end:
+                if start <= subrow[bookmark_property]:
                     singer.write_record("conversations", subrow, time_extracted=singer.utils.now())
         except HTTPError as e:
             if e.response.status_code == 403:
@@ -179,7 +172,7 @@ def sync_tickets_by_filter(bookmark_property, predefined_filter=None):
             logger.info("Ticket {}: Syncing satisfaction ratings".format(row['id']))
             for subrow in gen_request(get_url("sub_ticket", id=row['id'], entity="satisfaction_ratings")):
                 subrow['ratings'] = transform_dict(subrow['ratings'], key_key="question")
-                if start <= subrow[bookmark_property] <= end:
+                if start <= subrow[bookmark_property]:
                     singer.write_record("satisfaction_ratings", subrow, time_extracted=singer.utils.now())
         except HTTPError as e:
             if e.response.status_code == 403:
@@ -190,7 +183,7 @@ def sync_tickets_by_filter(bookmark_property, predefined_filter=None):
         try:
             logger.info("Ticket {}: Syncing time entries".format(row['id']))
             for subrow in gen_request(get_url("sub_ticket", id=row['id'], entity="time_entries")):
-                if start <= subrow[bookmark_property] <= end:
+                if start <= subrow[bookmark_property]:
                     singer.write_record("time_entries", subrow, time_extracted=singer.utils.now())
 
         except HTTPError as e:
@@ -217,11 +210,10 @@ def sync_time_filtered(entity):
                         bookmark_properties=[bookmark_property])
 
     start = get_start(entity)
-    end = get_end(entity)
 
-    logger.info("Syncing {} from {} to {}".format(entity, start, end))
+    logger.info("Syncing {} from {} to {}".format(entity, start))
     for row in gen_request(get_url(entity)):
-        if start <= row[bookmark_property] <= end:
+        if start <= row[bookmark_property]:
             if 'custom_fields' in row:
                 row['custom_fields'] = transform_dict(row['custom_fields'], force_str=True)
 
