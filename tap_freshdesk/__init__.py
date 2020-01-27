@@ -217,7 +217,7 @@ def sync_time_filtered(entity):
                         bookmark_properties=[bookmark_property])
 
     start = get_start(entity)
-    end = get_end(state_entity)
+    end = get_end(entity)
 
     logger.info("Syncing {} from {} to {}".format(entity, start, end))
     for row in gen_request(get_url(entity)):
