@@ -2,7 +2,7 @@
 
 import sys
 import time
-
+from datetime import datetime, timedelta
 import backoff
 import requests
 from requests.exceptions import HTTPError
@@ -55,11 +55,27 @@ def request(url, params=None, auth=None):
 
     return resp
 
+def get_date(entity):
+    if entity not in STATE:
+        STATE[entity] = (datetime.now() - timedelta(1)).strftime('%Y-%m-%d')
+
+    return STATE[entity]
+
+
 def sync_ticket_activities():
     logger.info("Getting ticket_activities URL")
 
     auth = (CONFIG['api_key'], "")
-    data = request(get_url('ticket_activities'), {}, auth).json()
+
+    endpoint = "ticket_activities"
+
+    activities_date = get_date(endpoint)
+
+    params = {
+        'created_at': activities_date
+    }
+
+    data = request(get_url(endpoint), params, auth).json()
 
     export_url = data['export'][0]['url']
     data = request(export_url).json()
