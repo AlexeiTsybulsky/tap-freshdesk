@@ -78,6 +78,9 @@
         "thank_you_note": {
           "type" : ["null", "boolean"]
         },
+        "added_watcher": {
+          "type" : ["null", "array"]
+        },
         "spam": {
           "type" : ["null", "boolean"]
         },
