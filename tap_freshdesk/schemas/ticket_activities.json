@@ -69,6 +69,9 @@
         "added_tags": {
           "type" : ["null", "array"]
         },
+        "added_watcher": {
+          "type" : ["null", "array"]
+        },
         "removed_tags": {
           "type" : ["null", "array"]
         },
@@ -77,9 +80,6 @@
         },
         "thank_you_note": {
           "type" : ["null", "boolean"]
-        },
-        "added_watcher": {
-          "type" : ["null", "array"]
         },
         "spam": {
           "type" : ["null", "boolean"]
