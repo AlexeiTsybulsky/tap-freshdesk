@@ -69,10 +69,13 @@
         "added_tags": {
           "type" : ["null", "array"]
         },
+        "removed_tags": {
+          "type" : ["null", "array"]
+        },
         "added_watcher": {
           "type" : ["null", "array"]
         },
-        "removed_tags": {
+        "removed_watcher": {
           "type" : ["null", "array"]
         },
         "Updated Amendment Tool in Internal Tools": {

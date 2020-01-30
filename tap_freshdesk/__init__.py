@@ -86,7 +86,7 @@ def sync_ticket_activities():
 
     for row in data['activities_data']:
         for key in row['activity'].keys():
-            if key not in ['note', 'automation', 'association', 'requester_id', 'source', 'priority', 'new_ticket', 'agent_id','added_tags','added_watcher','removed_tags','Updated Amendment Tool in Internal Tools','send_email','thank_you_note','spam','deleted']:
+            if key not in ['note', 'automation', 'association', 'requester_id', 'source', 'priority', 'new_ticket', 'agent_id','added_tags','removed_tags','added_watcher','removed_watcher','Updated Amendment Tool in Internal Tools','send_email','thank_you_note','spam','deleted']:
                 updated_schema['properties'][key] = { "type": ["null", "string"] }
 
     bookmark_property = 'performed_at'
