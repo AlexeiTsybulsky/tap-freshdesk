@@ -88,12 +88,12 @@ def sync_ticket_activities():
         for key in row['activity'].keys():
             if key not in ['note', 'automation', 'association', 'requester_id', 'source', 'priority', 'new_ticket', 'agent_id','added_tags','removed_tags','added_watcher','removed_watcher','Updated Amendment Tool in Internal Tools','send_email','thank_you_note','spam','deleted']:
                 updated_schema['properties'][key] = { "type": ["null", "string"] }
-        row['performed_at'] = datetime.strptime(row['performed_at'], '%d-%m-%Y %H:%M:%S %z')
+        row['performed_at'] = datetime.strftime(datetime.strptime(row['performed_at'], '%d-%m-%Y %H:%M:%S %z'), '%Y-%m-%dT%H:%M:%SZ')
 
     bookmark_property = 'performed_at'
     schema = utils.load_schema('ticket_activities')
     schema['properties']['activity']['properties'].update(updated_schema['properties'])
-    
+
     singer.write_schema('ticket_activities',
                     schema,
                     [],
