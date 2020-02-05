@@ -43,6 +43,29 @@
             }
           }
         },
+        "timesheet": {
+          "type": ["null", "object"],
+          "properties": {
+            "action": {
+              "type": ["null", "string"]
+            },
+            "spent_on": {
+              "type": ["null", "string"]
+            },
+            "hours_spent": {
+              "type": ["null", "string"]
+            },
+            "agent_id": {
+              "type": ["null", "integer"]
+            },
+            "billable": {
+              "type": ["null", "boolean"]
+            },
+            "id": {
+              "type": ["null", "integer"]
+            }
+          }
+        },
         "send_email": {
           "type": ["null", "object"],
           "properties": {
