@@ -118,7 +118,7 @@ def do_sync():
         logger.critical(
             "Error making request to Freshdesk API: GET %s: [%s - %s]",
             e.request.url, e.response.status_code, e.response.content)
-        sys.exit(1)
+        raise e
 
     logger.info("Completed sync")
 
