@@ -130,13 +130,5 @@ def main_impl():
     do_sync()
 
 
-def main():
-    try:
-        main_impl()
-    except Exception as exc:
-        logger.critical(exc)
-        raise exc
-
-
 if __name__ == '__main__':
-    main()
+    main_impl()
