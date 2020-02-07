@@ -123,7 +123,7 @@ def do_sync():
     logger.info("Completed sync")
 
 
-def main_impl():
+def main():
     config, state = utils.parse_args(REQUIRED_CONFIG_KEYS)
     CONFIG.update(config)
     STATE.update(state)
@@ -131,4 +131,4 @@ def main_impl():
 
 
 if __name__ == '__main__':
-    main_impl()
+    main()
