@@ -43,29 +43,6 @@
             }
           }
         },
-        "timesheet": {
-          "type": ["null", "object"],
-          "properties": {
-            "action": {
-              "type": ["null", "string"]
-            },
-            "spent_on": {
-              "type": ["null", "string"]
-            },
-            "hours_spent": {
-              "type": ["null", "string"]
-            },
-            "agent_id": {
-              "type": ["null", "integer"]
-            },
-            "billable": {
-              "type": ["null", "boolean"]
-            },
-            "id": {
-              "type": ["null", "integer"]
-            }
-          }
-        },
         "send_email": {
           "type": ["null", "object"],
           "properties": {
@@ -95,12 +72,6 @@
         "removed_tags": {
           "type" : ["null", "array"]
         },
-        "added_watcher": {
-          "type" : ["null", "array"]
-        },
-        "removed_watcher": {
-          "type" : ["null", "array"]
-        },
         "Updated Amendment Tool in Internal Tools": {
           "type" : ["null", "boolean"]
         },
@@ -116,8 +87,7 @@
       }
     },
     "performed_at": {
-      "type": ["null", "string"],
-      "format": "date-time"
+      "type": ["null", "string"]
     },
     "ticket_id": {
       "type": ["null", "integer"]

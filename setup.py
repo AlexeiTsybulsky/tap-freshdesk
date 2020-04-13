@@ -21,7 +21,15 @@ setup(name='tap-freshdesk',
       packages=['tap_freshdesk'],
       package_data = {
           'tap_freshdesk/schemas': [
-              'ticket_activities.json'
+              'agents.json',
+              'companies.json',
+              'contacts.json',
+              'conversations.json',
+              'groups.json',
+              'roles.json',
+              'satisfaction_ratings.json',
+              'tickets.json',
+              'time_entries.json',
           ],
       },
       include_package_data=True,
