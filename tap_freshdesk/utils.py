@@ -8,7 +8,6 @@ import time
 
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%SZ"
 
-
 def strptime(dt):
     return datetime.datetime.strptime(dt, DATETIME_FMT)
 
@@ -17,25 +16,26 @@ def strftime(dt):
     return dt.strftime(DATETIME_FMT)
 
 
-def ratelimit(limit, every):
-    def limitdecorator(fn):
+class RateLimit(object):
+    def __init__(self, limit=1, every=2):
+        self.limit = limit
+        self.every = every
+
+    def __call__(self, fn):
         times = collections.deque()
 
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
-            if len(times) >= limit:
+            if len(times) >= self.limit:
                 t0 = times.pop()
                 t = time.time()
-                sleep_time = every - (t - t0)
+                sleep_time = self.every - (t - t0)
                 if sleep_time > 0:
                     time.sleep(sleep_time)
 
             times.appendleft(time.time())
             return fn(*args, **kwargs)
-
         return wrapper
-
-    return limitdecorator
 
 
 def chunk(l, n):
@@ -56,12 +56,18 @@ def load_schema(entity):
     return load_json(get_abs_path("schemas/{}.json".format(entity)))
 
 
-def update_state(state, entity, dt):
+def update_state(state, entity, dt, query_dt=None):
     if dt is None:
         return
 
     if isinstance(dt, datetime.datetime):
         dt = strftime(dt)
+    
+    if query_dt:
+        if isinstance(query_dt, datetime.datetime):
+            query_dt = strftime(query_dt)
+        if dt > query_dt:
+            dt = query_dt
 
     if entity not in state:
         state[entity] = dt
