@@ -40,7 +40,7 @@ def get_url(endpoint, **kwargs):
                       max_tries=5,
                       giveup=lambda e: e.response is not None and 400 <= e.response.status_code < 500,
                       factor=2)
-@utils.ratelimit(1, 2)
+@utils.RateLimit(limit=1, every=2)
 def request(url, params=None, auth=None):
     params = params or {}
     auth = auth or None
@@ -152,6 +152,7 @@ def sync_tickets_by_filter(bookmark_property, predefined_filter=None):
     if predefined_filter:
         params['filter'] = predefined_filter
 
+    query_time = singer.utils.now()
     for i, row in enumerate(gen_request(get_url(endpoint), params)):
         logger.info("Ticket {}: Syncing".format(row['id']))
         row.pop('attachments', None)
@@ -200,7 +201,7 @@ def sync_tickets_by_filter(bookmark_property, predefined_filter=None):
             else:
                 raise
 
-        utils.update_state(STATE, state_entity, row[bookmark_property])
+        utils.update_state(STATE, state_entity, row[bookmark_property], query_dt=query_time)
         singer.write_record(endpoint, row, time_extracted=singer.utils.now())
         singer.write_state(STATE)
 
@@ -214,12 +215,13 @@ def sync_time_filtered(entity):
     start = get_start(entity)
 
     logger.info("Syncing {} from {}".format(entity, start))
+    query_time = singer.utils.now()
     for row in gen_request(get_url(entity)):
         if row[bookmark_property] >= start:
             if 'custom_fields' in row:
                 row['custom_fields'] = transform_dict(row['custom_fields'], force_str=True)
 
-            utils.update_state(STATE, entity, row[bookmark_property])
+            utils.update_state(STATE, entity, row[bookmark_property], query_dt=query_time)
             singer.write_record(entity, row, time_extracted=singer.utils.now())
 
     singer.write_state(STATE)
@@ -296,6 +298,7 @@ def main():
     config, state = utils.parse_args(REQUIRED_CONFIG_KEYS)
     CONFIG.update(config)
     STATE.update(state)
+    request.every = CONFIG.get('request_delay', 2)
     do_sync()
 
 
