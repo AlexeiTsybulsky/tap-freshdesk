@@ -68,12 +68,6 @@ def get_start(entity):
 
     return STATE[entity]
 
-def get_date(entity):
-    if entity not in STATE:
-        STATE[entity] = (datetime.now() - timedelta(1)).strftime('%Y-%m-%d')
-
-    return STATE[entity]
-
 def gen_request(url, params=None):
     params = params or {}
     params["per_page"] = PER_PAGE
@@ -231,7 +225,7 @@ def sync_ticket_activities():
 
     endpoint = "ticket_activities"
 
-    activities_date = get_date(endpoint)
+    activities_date = get_start(endpoint)
 
     params = {
         'created_at': activities_date
