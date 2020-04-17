@@ -292,7 +292,8 @@ def main():
     config, state = utils.parse_args(REQUIRED_CONFIG_KEYS)
     CONFIG.update(config)
     STATE.update(state)
-    request.every = CONFIG.get('request_delay', 2)
+    utils.RATE_EVERY_OVERRIDE = CONFIG.get('request_delay', 2)
+    utils.RATE_LIMIT_OVERRIDE = CONFIG.get('request_threshold', 1)
     do_sync()
 
 
