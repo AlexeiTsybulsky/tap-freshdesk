@@ -16,6 +16,7 @@ PER_PAGE = 100
 BASE_URL = "https://{}.freshdesk.com"
 CONFIG = {}
 STATE = {}
+TICKETS_DATETIME_FMT = "%Y-%m-%d"
 
 endpoints = {
     "tickets": "/api/v2/tickets",
@@ -229,43 +230,51 @@ def sync_ticket_activities():
 
     activities_date = get_start(endpoint)
 
-    params = {
-        'created_at': activities_date
-    }
+    while True:
+        params = {
+            'created_at': activities_date
+        }
 
-    data = request(get_url(endpoint), params, auth).json()
+        try:
+            data = request(get_url(endpoint), params, auth).json()
+        except HTTPError as e:
+            resp_json = e.response.json()
+            if 'message' in resp_json and resp_json['message'] == 'file_not_found':
+                break
+            else:
+                raise e
 
-    export_url = data['export'][0]['url']
-    data = request(export_url).json()
+        export_url = data['export'][0]['url']
+        data = request(export_url).json()
 
-    updated_schema = {
-        "properties": {}
-    }
+        updated_schema = {
+            "properties": {}
+        }
 
-    for row in data['activities_data']:
-        for key in row['activity'].keys():
-            if key not in ['note', 'automation', 'association','timesheet','send_email','requester_id', 'source', 'priority', 'new_ticket', 'agent_id','added_tags','removed_tags','added_watcher','removed_watcher','Updated Amendment Tool in Internal Tools','thank_you_note','spam','deleted']:
-                updated_schema['properties'][key] = { "type": ["null", "string"] }
-                key = str(key)
+        for row in data['activities_data']:
+            for key in row['activity'].keys():
+                if key not in ['note', 'automation', 'association','timesheet','send_email','requester_id', 'source', 'priority', 'new_ticket', 'agent_id','added_tags','removed_tags','added_watcher','removed_watcher','Updated Amendment Tool in Internal Tools','thank_you_note','spam','deleted']:
+                    updated_schema['properties'][key] = { "type": ["null", "string"] }
+                    key = str(key)
 
-        row['performed_at'] = datetime.strftime(datetime.strptime(row['performed_at'], '%d-%m-%Y %H:%M:%S %z'), '%Y-%m-%dT%H:%M:%SZ')
+            row['performed_at'] = datetime.strftime(datetime.strptime(row['performed_at'], '%d-%m-%Y %H:%M:%S %z'), '%Y-%m-%dT%H:%M:%SZ')
 
-    bookmark_property = 'performed_at'
-    schema = utils.load_schema('ticket_activities')
-    schema['properties']['activity']['properties'].update(updated_schema['properties'])
+        bookmark_property = 'performed_at'
+        schema = utils.load_schema('ticket_activities')
+        schema['properties']['activity']['properties'].update(updated_schema['properties'])
 
-    singer.write_schema('ticket_activities',
-                    schema,
-                    [],
-                    bookmark_properties=[bookmark_property])
+        singer.write_schema('ticket_activities',
+                        schema,
+                        [],
+                        bookmark_properties=[bookmark_property])
 
-    for row in data['activities_data']:
-        logger.info("Ticket {}: Syncing".format(row['ticket_id']))
+        activities_date = datetime.strftime(datetime.strptime(activities_date, TICKETS_DATETIME_FMT) + timedelta(days=1), TICKETS_DATETIME_FMT)
+        for row in data['activities_data']:
+            logger.info("Ticket {}: Syncing".format(row['ticket_id']))
+            singer.write_record('ticket_activities', row, time_extracted=singer.utils.now())
 
-        utils.update_state(STATE, "ticket_activities", row[bookmark_property])
-        singer.write_record('ticket_activities', row, time_extracted=singer.utils.now())
-
-    singer.write_state(STATE)
+        utils.update_state(STATE, "ticket_activities", activities_date)
+        singer.write_state(STATE)
 
 def do_sync():
     logger.info("Starting FreshDesk sync")
