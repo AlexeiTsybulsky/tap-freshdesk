@@ -7,6 +7,8 @@ import os
 import time
 
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%SZ"
+RATE_EVERY_OVERRIDE = 0
+RATE_LIMIT_OVERRIDE = 0
 
 def strptime(dt):
     return datetime.datetime.strptime(dt, DATETIME_FMT)
@@ -29,6 +31,10 @@ class RateLimit(object):
             if len(times) >= self.limit:
                 t0 = times.pop()
                 t = time.time()
+                if RATE_EVERY_OVERRIDE > 0:
+                    self.every = RATE_EVERY_OVERRIDE
+                if RATE_LIMIT_OVERRIDE > 0:
+                    self.limit = RATE_LIMIT_OVERRIDE
                 sleep_time = self.every - (t - t0)
                 if sleep_time > 0:
                     time.sleep(sleep_time)
