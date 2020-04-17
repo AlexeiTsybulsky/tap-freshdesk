@@ -235,7 +235,6 @@ def sync_ticket_activities():
             'created_at': activities_date
         }
 
-        #import pdb; pdb.set_trace()
         try:
             data = request(get_url(endpoint), params, auth).json()
         except HTTPError as e:
@@ -281,13 +280,13 @@ def do_sync():
     logger.info("Starting FreshDesk sync")
 
     try:
-        '''sync_tickets()
+        sync_tickets()
         sync_time_filtered("agents")
         sync_time_filtered("roles")
         sync_time_filtered("groups")
         # commenting out this high-volume endpoint for now
         #sync_time_filtered("contacts")
-        sync_time_filtered("companies")'''
+        sync_time_filtered("companies")
         sync_ticket_activities()
     except HTTPError as e:
         logger.critical(
